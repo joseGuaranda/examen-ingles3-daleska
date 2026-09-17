@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practica de Ingles - I have a ...</title>
+<style>
+  :root{
+    --bg:#eef3fb;
+    --card:#ffffff;
+    --primary:#4f6df5;
+    --primary-dark:#3b53c9;
+    --green:#3fb27f;
+    --red:#e6584f;
+    --gray-text:#5a6472;
+    --chip-bg:#f0f2f7;
+    --chip-border:#d7ddea;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Comic Sans MS','Segoe UI',Verdana,sans-serif;
+    background:linear-gradient(180deg,#eef3fb 0%,#e4ecfb 100%);
+    color:#2b2f3a;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:16px;
+  }
+  h1{
+    font-size:1.3rem;
+    color:var(--primary-dark);
+    text-align:center;
+    margin:6px 0 14px;
+  }
+  .topbar{
+    width:100%;
+    max-width:640px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:1.1rem;
+    font-weight:bold;
+    color:var(--gray-text);
+    padding:0 4px;
+    margin-bottom:8px;
+  }
+  .topbar .score{color:var(--green);}
+  .card{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow:0 6px 18px rgba(60,70,120,0.12);
+    width:100%;
+    max-width:640px;
+    padding:20px;
+    text-align:center;
+  }
+  .imgbox{
+    border:2px solid var(--chip-border);
+    border-radius:14px;
+    padding:8px;
+    display:inline-block;
+    background:#fafbff;
+    margin:0 auto 16px;
+  }
+  .imgbox img{
+    max-width:100%;
+    max-height:320px;
+    display:block;
+    border-radius:8px;
+    margin:0 auto;
+  }
+  .answer-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    min-height:54px;
+    border-bottom:3px solid var(--chip-border);
+    padding-bottom:12px;
+    margin-bottom:18px;
+  }
+  .bank-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:18px;
+    min-height:54px;
+  }
+  .word{
+    padding:10px 16px;
+    border-radius:12px;
+    border:2px solid var(--chip-border);
+    background:var(--chip-bg);
+    font-size:1.15rem;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .12s ease, background .2s ease;
+  }
+  .word:hover{transform:translateY(-2px);}
+  .word.placed{
+    background:#dfe6ff;
+    border-color:var(--primary);
+  }
+  .word.correct{
+    background:#d5f3e3;
+    border-color:var(--green);
+    color:#256b47;
+  }
+  .word.wrong{
+    background:#fbdedb;
+    border-color:var(--red);
+    color:#9c2f27;
+  }
+  .slot-empty{
+    min-width:40px;
+    border-bottom:3px dashed #c3cae0;
+    display:inline-block;
+  }
+  .controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  button.action{
+    padding:10px 20px;
+    border:none;
+    border-radius:12px;
+    font-size:1rem;
+    font-weight:bold;
+    cursor:pointer;
+    color:#fff;
+    background:var(--primary);
+  }
+  button.action:hover{background:var(--primary-dark);}
+  button.action.secondary{background:#98a2b3;}
+  button.action.secondary:hover{background:#7c8798;}
+  button.action:disabled{background:#c4cadb;cursor:not-allowed;}
+  .feedback{
+    min-height:28px;
+    font-weight:bold;
+    margin-bottom:8px;
+  }
+  .feedback.ok{color:var(--green);}
+  .feedback.bad{color:var(--red);}
+  .navbar{
+    width:100%;
+    max-width:640px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:14px;
+  }
+  .navbar button{
+    background:var(--card);
+    border:2px solid var(--chip-border);
+    border-radius:50%;
+    width:46px;
+    height:46px;
+    font-size:1.3rem;
+    cursor:pointer;
+    color:var(--primary-dark);
+  }
+  .navbar button:disabled{opacity:0.35;cursor:not-allowed;}
+  .navbar .progress{font-weight:bold;color:var(--gray-text);}
+  .speak-btn{
+    background:none;
+    border:none;
+    font-size:1.4rem;
+    cursor:pointer;
+    vertical-align:middle;
+    margin-left:6px;
+  }
+  .final-screen{
+    text-align:center;
+    padding:30px 10px;
+  }
+  .final-screen h2{color:var(--primary-dark);}
+  .final-score{font-size:2.2rem;color:var(--green);font-weight:bold;margin:14px 0;}
+</style>
+</head>
+<body>
+
+<h1>I have a ... &mdash; ordena la oracion en ingles</h1>
+
+<div class="topbar">
+  <span id="timer">0:00</span>
+  <span class="score">Puntaje: <span id="score">0</span></span>
+</div>
+
+<div class="card" id="card">
+  <!-- filled by JS -->
+</div>
+
+<div class="navbar">
+  <button id="prevBtn" title="Anterior">&#9664;</button>
+  <span class="progress" id="progress">1 de 24</span>
+  <button id="nextBtn" title="Siguiente">&#9654;</button>
+</div>
+
+<script>
+// ---- Datos de las 24 preguntas ----
+// Cada oracion: "I have a/an [color] [animal]."
+const questions = [
+  {img:"img/q01-dog-red.png",      words:["I","have","a","red","dog"]},
+  {img:"img/q02-cat-blue.png",     words:["I","have","a","blue","cat"]},
+  {img:"img/q03-fish-yellow.png",  words:["I","have","a","yellow","fish"]},
+  {img:"img/q04-rabbit-green.png", words:["I","have","a","green","rabbit"]},
+  {img:"img/q05-turtle-orange.png",words:["I","have","an","orange","turtle"]},
+  {img:"img/q06-parrot-pink.png",  words:["I","have","a","pink","parrot"]},
+  {img:"img/q07-snake-purple.png", words:["I","have","a","purple","snake"]},
+  {img:"img/q08-spider-black.png", words:["I","have","a","black","spider"]},
+  {img:"img/q09-frog-white.png",   words:["I","have","a","white","frog"]},
+  {img:"img/q10-pony-brown.png",   words:["I","have","a","brown","pony"]},
+  {img:"img/q11-mouse-gray.png",   words:["I","have","a","gray","mouse"]},
+  {img:"img/q12-pig-beige.png",    words:["I","have","a","beige","pig"]},
+  {img:"img/q13-dog-green.png",    words:["I","have","a","green","dog"]},
+  {img:"img/q14-cat-purple.png",   words:["I","have","a","purple","cat"]},
+  {img:"img/q15-fish-pink.png",    words:["I","have","a","pink","fish"]},
+  {img:"img/q16-rabbit-brown.png", words:["I","have","a","brown","rabbit"]},
+  {img:"img/q17-turtle-gray.png",  words:["I","have","a","gray","turtle"]},
+  {img:"img/q18-parrot-red.png",   words:["I","have","a","red","parrot"]},
+  {img:"img/q19-snake-blue.png",   words:["I","have","a","blue","snake"]},
+  {img:"img/q20-spider-yellow.png",words:["I","have","a","yellow","spider"]},
+  {img:"img/q21-frog-orange.png",  words:["I","have","an","orange","frog"]},
+  {img:"img/q22-pony-beige.png",   words:["I","have","a","beige","pony"]},
+  {img:"img/q23-mouse-white.png",  words:["I","have","a","white","mouse"]},
+  {img:"img/q24-pig-black.png",    words:["I","have","a","black","pig"]},
+];
+
+let current = 0;
+let totalScore = 0;
+let startTime = Date.now();
+
+// estado por pregunta: respuesta actual, banco revuelto, si ya se conto cada posicion, si ya se dio el bono
+const state = questions.map(q => ({
+  bank: shuffle(q.words.map((w,i)=>({word:w, id:i}))),
+  answer: [],
+  positionScored: new Array(q.words.length).fill(false),
+  bonusGiven: false,
+  solved:false
+}));
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  // evitar que quede ya ordenada por casualidad
+  if(a.every((x,i)=>x.id===i) && a.length>1){
+    [a[0],a[1]]=[a[1],a[0]];
+  }
+  return a;
+}
+
+const cardEl = document.getElementById("card");
+const scoreEl = document.getElementById("score");
+const progressEl = document.getElementById("progress");
+const timerEl = document.getElementById("timer");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+function render(){
+  const q = questions[current];
+  const st = state[current];
+  progressEl.textContent = (current+1) + " de " + questions.length;
+  prevBtn.disabled = current===0;
+  nextBtn.disabled = current===questions.length-1;
+
+  let html = "";
+  html += '<div class="imgbox"><img src="'+q.img+'" alt="animal"></div>';
+  html += '<div class="answer-row" id="answerRow"></div>';
+  html += '<div class="bank-row" id="bankRow"></div>';
+  html += '<div class="feedback" id="feedback"></div>';
+  html += '<div class="controls">';
+  html += '<button class="action" id="checkBtn">Verificar</button>';
+  html += '<button class="action secondary" id="resetBtn">Reiniciar</button>';
+  html += '<button class="speak-btn" id="speakBtn" title="Escuchar">&#128266;</button>';
+  html += '</div>';
+  cardEl.innerHTML = html;
+
+  drawAnswer();
+  drawBank();
+
+  document.getElementById("checkBtn").onclick = checkAnswer;
+  document.getElementById("resetBtn").onclick = resetQuestion;
+  document.getElementById("speakBtn").onclick = speakSentence;
+}
+
+function drawAnswer(){
+  const st = state[current];
+  const row = document.getElementById("answerRow");
+  row.innerHTML = "";
+  st.answer.forEach((tok, pos) => {
+    const span = document.createElement("span");
+    span.className = "word placed";
+    if(st.positionScored[pos]){
+      span.classList.add(tok.classAfterCheck || "");
+    }
+    span.textContent = tok.word;
+    span.onclick = () => {
+      if(state[current].solved) return;
+      // quitar de la respuesta y devolver al banco
+      state[current].answer.splice(pos,1);
+      state[current].bank.push(tok);
+      drawAnswer();
+      drawBank();
+      document.getElementById("feedback").textContent = "";
+    };
+    row.appendChild(span);
+  });
+  // slots vacios restantes
+  const remaining = questions[current].words.length - st.answer.length;
+  for(let i=0;i<remaining;i++){
+    const slot = document.createElement("span");
+    slot.className = "slot-empty";
+    row.appendChild(slot);
+  }
+}
+
+function drawBank(){
+  const st = state[current];
+  const row = document.getElementById("bankRow");
+  row.innerHTML = "";
+  st.bank.forEach((tok) => {
+    const span = document.createElement("span");
+    span.className = "word";
+    span.textContent = tok.word;
+    span.onclick = () => {
+      if(state[current].solved) return;
+      state[current].answer.push(tok);
+      state[current].bank = state[current].bank.filter(t=>t!==tok);
+      drawAnswer();
+      drawBank();
+      document.getElementById("feedback").textContent = "";
+    };
+    row.appendChild(span);
+  });
+}
+
+function checkAnswer(){
+  const q = questions[current];
+  const st = state[current];
+  const fb = document.getElementById("feedback");
+
+  if(st.answer.length < q.words.length){
+    fb.textContent = "Coloca todas las palabras antes de verificar.";
+    fb.className = "feedback bad";
+    return;
+  }
+
+  let newlyCorrect = 0;
+  let allCorrect = true;
+  st.answer.forEach((tok, pos) => {
+    const isCorrect = tok.word === q.words[pos];
+    if(!isCorrect) allCorrect = false;
+    if(isCorrect && !st.positionScored[pos]){
+      st.positionScored[pos] = true;
+      totalScore += 1;
+      newlyCorrect += 1;
+    }
+    tok.classAfterCheck = isCorrect ? "correct" : "wrong";
+  });
+
+  if(allCorrect && !st.bonusGiven){
+    st.bonusGiven = true;
+    totalScore += 5;
+    st.solved = true;
+    fb.textContent = "Muy bien! Oracion completa correcta. +5 de bono!";
+    fb.className = "feedback ok";
+  } else if(allCorrect){
+    fb.textContent = "Correcto!";
+    fb.className = "feedback ok";
+    st.solved = true;
+  } else {
+    fb.textContent = "Algunas palabras no estan en el lugar correcto. Intenta de nuevo.";
+    fb.className = "feedback bad";
+  }
+
+  scoreEl.textContent = totalScore;
+  drawAnswer();
+}
+
+function resetQuestion(){
+  const q = questions[current];
+  const st = state[current];
+  st.bank = shuffle(q.words.map((w,i)=>({word:w,id:i})));
+  st.answer = [];
+  document.getElementById("feedback").textContent = "";
+  drawAnswer();
+  drawBank();
+}
+
+function pickEnglishVoice(){
+  try{
+    const voices = speechSynthesis.getVoices() || [];
+    const enVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith("en"));
+    if(enVoices.length === 0) return null;
+    const preferred = enVoices.find(v => /US|United States/i.test(v.name) || /en-US/i.test(v.lang));
+    const natural = enVoices.find(v => /Google|Natural|Online|Neural/i.test(v.name));
+    return natural || preferred || enVoices[0];
+  }catch(e){ return null; }
+}
+
+function speakSentence(){
+  const q = questions[current];
+  // coma entre palabras para forzar una pausa breve y que se entienda cada palabra
+  const text = q.words.join(", ") + ".";
+  try{
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    utter.rate = 0.6;
+    utter.pitch = 1;
+    const voice = pickEnglishVoice();
+    if(voice) utter.voice = voice;
+    speechSynthesis.speak(utter);
+  }catch(e){}
+}
+
+if(typeof speechSynthesis !== "undefined"){
+  speechSynthesis.onvoiceschanged = () => { /* voces listas */ };
+}
+
+prevBtn.onclick = () => { if(current>0){ current--; render(); } };
+nextBtn.onclick = () => { if(current<questions.length-1){ current++; render(); } };
+
+function tick(){
+  const secs = Math.floor((Date.now()-startTime)/1000);
+  const m = Math.floor(secs/60);
+  const s = secs%60;
+  timerEl.textContent = m + ":" + (s<10?"0":"") + s;
+}
+setInterval(tick, 1000);
+
+render();
+</script>
+</body>
+</html>
